@@ -16,6 +16,7 @@ class Pacman(object):
         self.prev =  pacr
         self.recent_position()
         #self.pressed = False
+        self.last = STOP
 
     def recent_position(self):
         self.location = self.node.location.copy()
@@ -50,6 +51,13 @@ class Pacman(object):
         return None
 
     def move_self(self):
+        if (self.last is not STOP and self.pass_target()):
+            self.node = self.target
+            if (self.node.near[self.last] is not None):
+                self.target = self.node.near[self.last]
+                self.recent_position()
+                self.move = self.last
+                self.last = STOP
         if (self.move is not STOP):
             if (self.pass_target()):
                 self.node = self.target
@@ -68,7 +76,9 @@ class Pacman(object):
         else:
             if (move == self.move * -1):
                 self.reverse()
-            elif (move != self.move)
+                self.last = STOP
+            elif (move != self.move):
+                self.last = move
             if (self.pass_target()):
                 self.node = self.target
                 if (self.node.near[move] is not None):

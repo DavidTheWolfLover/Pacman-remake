@@ -42,9 +42,9 @@ class GameControl(object):
                 
     def redraw(self):
         self.screen.fill(black)
-        for i in range(game_rows):
-            for j in range(game_cols):
-                pygame.draw.rect(self.screen, blue,(Tile_Width *(j+0.8) , Tile_Height * (i+0.8), 9, 9))
+        #for i in range(game_rows):
+       #     for j in range(game_cols):
+        #        pygame.draw.rect(self.screen, blue,(Tile_Width *(j+0.8) , Tile_Height * (i+0.8), 9, 9))
         self.Nodes.refresh(self.screen)
         self.pacman.draw(self.screen)
         pygame.display.update()
