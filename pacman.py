@@ -1,45 +1,110 @@
 import pygame
-import numpy as np
+import math
+from pygame.locals import *
+from vector import Vector2
+from constants import *
 
+class Pacman(object):
+    def __init__(self,nodes):
+        self.name = "Pacman"
+        self.move = STOP
+        self.speed = 100
+        self.radius = 10
+        self.nodes = nodes
+        self.node = nodes.points[0]
+        self.target = self.node
+        self.prev =  pacr
+        self.recent_position()
+        #self.pressed = False
 
-def main():
-    WHITE = (255, 255, 255)
-    BLUE = (0, 0, 255)
-    BLACK = (0, 51, 0)
-    RED = (255, 0, 0)
-    pygame.init()
+    def recent_position(self):
+        self.location = self.node.location.copy()
 
-    screen_height = 600
-    screen_width = 900
+    def update(self,t):
+        self.location += self.move*self.speed*t
+        move = self.check_direction()
+        if (move):
+            self.move_key(move)
+        else:
+            self.move_self()
 
-    DISPLAY = pygame.display.set_mode((screen_width, screen_height), 0, 32)
+    def pass_target(self):
+        if self.target is not None:
+            v1 =  self.location - self.node.location
+            v2 = self.target.location - self.node.location
+            d1 = v1.magnitudeSquared()
+            d2 = v2.magnitudeSquared()
+            return d1>=d2
+        return False
 
-    DISPLAY.fill(WHITE)
+    def check_direction(self):
+        key = pygame.key.get_pressed()
+        if (key[K_UP] == True):
+            return UP
+        if (key[K_DOWN] == True):
+            return DOWN
+        if (key[K_LEFT] == True):
+            return LEFT
+        if (key[K_RIGHT] == True):
+            return RIGHT
+        return None
 
-    #pygame.draw.rect(DISPLAY, BLACK, (200, 150, 10, 10))
-    dist = 50  #real dist between two squares is 40 (40 + 10 from the top left corner of the square)
-    marg = 20  # margin
-    square_size = 10
-    n = screen_height // dist
-    m = screen_width // dist
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-        
-        for i in range(n):
-            for j in range(m):
-                """
-                if (.............) : #is path => put food there
-                    pygame.draw.rect(DISPLAY, BLACK,(j * dist + marg, i * dist + marg, square_size, square_size))
-                else if (...........) : #is special skill 
-                    ................................
-                else: #is wall
-                    ............................... """
-                if (i == 1 and j == 2) or (i == n - 2 and j == m - 3): # is_food
-                    pygame.draw.circle(DISPLAY, RED, (j * dist + marg + square_size / 2, i * dist + marg + square_size / 2),7)
+    def move_self(self):
+        if (self.move is not STOP):
+            if (self.pass_target()):
+                self.node = self.target
+                if (self.node.near[self.move] is not None):
+                    self.target = self.node.near[self.move]
                 else:
-                    pygame.draw.rect(DISPLAY, BLUE,(j * dist + marg, i * dist + marg, square_size, square_size))
-        pygame.display.update()
+                    self.recent_position()
+                    self.move = STOP
 
-main()
+    def move_key(self, move):
+        if (self.move is STOP):
+            if (self.node.near[move] is not None):
+                self.move = move
+                self.target = self.node.near[self.move]
+                self.recent_position()
+        else:
+            if (move == self.move * -1):
+                self.reverse()
+            elif (move != self.move)
+            if (self.pass_target()):
+                self.node = self.target
+                if (self.node.near[move] is not None):
+                    self.target = self.node.near[move]
+                    if (self.move != move):
+                        self.recent_position()
+                        self.move = move
+                elif (self.node.near[self.move] is not None):
+                    self.target = self.node.near[self.move]
+                else:
+                    self.recent_position()
+                    self.move = STOP
+
+    def reverse(self):
+        if (self.move is UP):
+            self.move = DOWN
+        elif (self.move is DOWN):
+            self.move = UP
+        elif (self.move is LEFT):
+            self.move = RIGHT
+        elif (self.move is RIGHT):
+            self.move = LEFT
+        self.target, self.node = self.node, self.target
+        
+    def draw(self,screen):
+        l = (self.location.x-10,self.location.y-10)
+        pac = self.prev
+        if self.move is UP:
+            pac = pacu
+        if self.move is DOWN:
+            pac = pacd
+        if self.move is RIGHT:
+            pac = pacr
+        if self.move is LEFT:
+            pac = pacl
+        self.prev = pac
+        #l = (self.location.x,self.location.y)
+        #pygame.draw.circle(screen,yellow,l,self.radius)
+        screen.blit(pac,l)
